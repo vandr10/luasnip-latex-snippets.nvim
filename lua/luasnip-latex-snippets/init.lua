@@ -23,7 +23,7 @@ M.setup = function(opts)
 
   if opts.allow_on_markdown then
     vim.api.nvim_create_autocmd("FileType", {
-      pattern = "markdown",
+      pattern = { "markdown", "quarto" },
       group = augroup,
       once = true,
       callback = function()
@@ -124,7 +124,7 @@ M.setup_markdown = function()
   -- tex delimiters
   local normal_wA_tex = {
     parse_snippet({ trig = "mk", name = "Math" }, "$${1:${TM_SELECTED_TEXT}}$"),
-    parse_snippet({ trig = "dm", name = "Block Math" }, "$$\n\t${1:${TM_SELECTED_TEXT}}\n.$$"),
+    parse_snippet({ trig = "dm", name = "Block Math" }, "$$\n\t${1:${TM_SELECTED_TEXT}}\n$$"),
   }
   vim.list_extend(filtered, normal_wA_tex)
 

@@ -1,15 +1,15 @@
 local M = {}
 
 local MATH_NODES = {
-  displayed_equation = true,
-  inline_formula = true,
-  math_environment = true,
+    displayed_equation = true,
+    inline_formula = true,
+    math_environment = true,
 }
 
 local TEXT_NODES = {
-  text_mode = true,
-  label_definition = true,
-  label_reference = true,
+    text_mode = true,
+    label_definition = true,
+    label_reference = true,
 }
 
 local CODE_BLOCK_NODES = {    -- Add this to define code block node types
@@ -41,9 +41,23 @@ function M.in_text(check_parent)
     elseif MATH_NODES[node:type()] then
       return false
     end
-    node = node:parent()
-  end
-  return true
+
+    while node do
+        if node:type() == "text_mode" then
+            if check_parent then
+                -- For \text{}
+                local parent = node:parent()
+                if parent and MATH_NODES[parent:type()] then
+                    return false
+                end
+            end
+            return true
+        elseif MATH_NODES[node:type()] then
+            return false
+        end
+        node = node:parent()
+    end
+    return true
 end
 
 function M.in_mathzone()
@@ -67,9 +81,16 @@ function M.in_mathzone()
     elseif MATH_NODES[node:type()] then
       return true
     end
-    node = node:parent()
-  end
-  return false
+
+    while node do
+        if TEXT_NODES[node:type()] then
+            return false
+        elseif MATH_NODES[node:type()] then
+            return true
+        end
+        node = node:parent()
+    end
+    return false
 end
 
 return M
